@@ -1,6 +1,7 @@
 // lib/screens/book_details.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookDetails extends StatefulWidget {
   final String bookTitle;
@@ -21,6 +22,7 @@ class BookDetails extends StatefulWidget {
 }
 
 class _BookDetailsState extends State<BookDetails> {
+  
   double userRating = 0.0;                              // ← always double
   final TextEditingController reviewController = TextEditingController();
 
@@ -128,18 +130,105 @@ class _BookDetailsState extends State<BookDetails> {
 
             const Padding(padding: EdgeInsets.all(16), child: Text("বইটির বিবরণ এখানে থাকবে...")),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  ElevatedButton(onPressed: () {}, child: const Text('Get the Book')),
-                  const SizedBox(width: 12),
-                  OutlinedButton(onPressed: () {}, child: const Text('Add to list')),
-                ],
-              ),
-            ),
+            // ===== GET THE BOOK + ADD TO LIST (NEW VERSION) =====
+// ===== GET THE BOOK + ADD TO LIST (FIXED) =====
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Row(
+    children: [
+      // GET THE BOOK – Dropdown with Rokomari/Amazon
+      Expanded(
+  flex: 2,
+  child: PopupMenuButton<String>(
+    onSelected: (value) async {
+      late Uri url;
+      if (value == 'rokomari') {
+        url = Uri.parse('https://www.rokomari.com/book/213912/debota');
+      } else {
+        url = Uri.parse('https://www.amazon.com/s?k=${Uri.encodeComponent('${widget.bookTitle} ${widget.bookAuthor}')}');
+      }
 
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open link')),
+        );
+      }
+    },
+    itemBuilder: (context) => [
+      const PopupMenuItem(
+        value: 'rokomari',
+        child: Row(children: [Icon(Icons.shopping_bag, color: Colors.green), SizedBox(width: 10), Text('Rokomari.com')]),
+      ),
+      const PopupMenuItem(
+        value: 'amazon',
+        child: Row(children: [Icon(Icons.auto_awesome, color: Colors.orange), SizedBox(width: 10), Text('Amazon')]),
+      ),
+    ],
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF6D4C41), Color(0xFF8B4513)]),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
+      ),
+      child: const Center(
+        child: Text('Get the Book', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+      ),
+    ),
+  ),
+),
+      const SizedBox(width: 12),
+
+      // ADD TO LIST BUTTON
+      Expanded(
+        child: OutlinedButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Add to shelf coming soon!')),
+            );
+          },
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            side: const BorderSide(color: Color(0xFF6D4C41), width: 2),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: const Text(
+            'Add to list',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+            
+            
             const Divider(height: 50),
+
+            // ===== GENRE SECTION =====
+const SizedBox(height: 20),
+const Text(
+  'Genre',
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Color(0xFF3E2723),
+  ),
+),
+const SizedBox(height: 12),
+Wrap(
+  spacing: 10,
+  runSpacing: 10,
+  children: [
+    _genreChip('উপন্যাস', Colors.brown.shade100),
+    _genreChip('রোমান্টিক', Colors.pink.shade100),
+    _genreChip('হুমায়ূন আহমেদ', Colors.blue.shade100),
+    _genreChip('বাংলা সাহিত্য', Colors.green.shade100),
+    _genreChip('ক্লাসিক', Colors.orange.shade100),
+  ],
+),
 
             // REVIEW FORM
             Padding(
@@ -283,5 +372,32 @@ class _BookDetailsState extends State<BookDetails> {
         ),
       ),
     );
+  }
+}
+// Reusable Genre Chip
+Widget _genreChip(String label, Color color) {
+  return Chip(
+    label: Text(
+      label,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF3E2723),
+      ),
+    ),
+    backgroundColor: color,
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(color: color.darken(0.2), width: 1),
+    ),
+  );
+}
+extension ColorExtension on Color {
+  Color darken([double amount = 0.2]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
   }
 }

@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_rating_bar: ^4.0.1   # This line adds the star rating package
+  url_launcher: ^6.3.0   # ← make sure you have this (or higher)
 
 dev_dependencies:
   flutter_test:
