@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bangla_read/screens/writer_details.dart'; // ← ADD THIS LINE
 
 class BookDetails extends StatefulWidget {
   final String bookTitle;
@@ -20,7 +21,6 @@ class BookDetails extends StatefulWidget {
   @override
   State<BookDetails> createState() => _BookDetailsState();
 }
-
 class _BookDetailsState extends State<BookDetails> {
   
   double userRating = 0.0;                              // ← always double
@@ -112,7 +112,39 @@ class _BookDetailsState extends State<BookDetails> {
                       children: [
                         Text(widget.bookTitle,
                             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        Text(widget.bookAuthor, style: const TextStyle(fontSize: 16)),
+                        
+                        GestureDetector(
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WriterDetailsPage(
+          writerName: widget.bookAuthor,
+          writerImage: "https://i.imgur.com/2d8eYkP.jpg", // Humayun Ahmed photo
+          birthDeath: "১৩ নভেম্বর ১৯৪৮ – ১৯ জুলাই ২০১২",
+          description: "হুমায়ূন আহমেদ বাংলাদেশের সবচেয়ে জনপ্রিয় কথাসাহিত্যিক ও নাট্যকার। তিনি হিমু, মিসির আলি চরিত্রের স্রষ্টা।",
+          books: [
+            {"title": "দেবী", "cover": "https://i.imgur.com/debi.jpg"},
+            {"title": "হিমু", "cover": "https://i.imgur.com/himu.jpg"},
+            {"title": "মিসির আলি", "cover": "https://i.imgur.com/misir.jpg"},
+            {"title": "শঙ্খনীল কারাগার", "cover": "https://i.imgur.com/shonkho.jpg"},
+            {"title": "জোছনা ও জননীর গল্প", "cover": "https://i.imgur.com/jochona.jpg"},
+          ],
+        ),
+      ),
+    );
+  },
+  child: Text(
+    widget.bookAuthor,
+    style: const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF6D4C41),
+      decoration: TextDecoration.underline,
+      decorationColor: Color(0xFF6D4C41),
+    ),
+  ),
+),
+
                         const SizedBox(height: 8),
                         RatingBarIndicator(
                           rating: widget.bookRating,
@@ -129,82 +161,85 @@ class _BookDetailsState extends State<BookDetails> {
             ),
 
             const Padding(padding: EdgeInsets.all(16), child: Text("বইটির বিবরণ এখানে থাকবে...")),
-
-            // ===== GET THE BOOK + ADD TO LIST (NEW VERSION) =====
+        
 // ===== GET THE BOOK + ADD TO LIST (FIXED) =====
 Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
   child: Row(
     children: [
-      // GET THE BOOK – Dropdown with Rokomari/Amazon
-      Expanded(
-  flex: 2,
-  child: PopupMenuButton<String>(
-    onSelected: (value) async {
-      late Uri url;
-      if (value == 'rokomari') {
-        url = Uri.parse('https://www.rokomari.com/book/213912/debota');
-      } else {
-        url = Uri.parse('https://www.amazon.com/s?k=${Uri.encodeComponent('${widget.bookTitle} ${widget.bookAuthor}')}');
-      }
+      // GET THE BOOK – Small + Left aligned
+      PopupMenuButton<String>(
+        onSelected: (value) async {
+          final query = Uri.encodeComponent("${widget.bookTitle} ${widget.bookAuthor}");
+          final url = value == 'rokomari'
+              ? 'https://www.rokomari.com/search?term=$query'
+              : 'https://www.amazon.com/s?k=$query';
 
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open link')),
-        );
-      }
-    },
-    itemBuilder: (context) => [
-      const PopupMenuItem(
-        value: 'rokomari',
-        child: Row(children: [Icon(Icons.shopping_bag, color: Colors.green), SizedBox(width: 10), Text('Rokomari.com')]),
-      ),
-      const PopupMenuItem(
-        value: 'amazon',
-        child: Row(children: [Icon(Icons.auto_awesome, color: Colors.orange), SizedBox(width: 10), Text('Amazon')]),
-      ),
-    ],
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF6D4C41), Color(0xFF8B4513)]),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
-      ),
-      child: const Center(
-        child: Text('Get the Book', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
-      ),
-    ),
-  ),
-),
-      const SizedBox(width: 12),
-
-      // ADD TO LIST BUTTON
-      Expanded(
-        child: OutlinedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Add to shelf coming soon!')),
-            );
-          },
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            side: const BorderSide(color: Color(0xFF6D4C41), width: 2),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          if (await canLaunchUrl(Uri.parse(url))) {
+            await launchUrl(Uri.parse(url));
+          }
+        },
+        itemBuilder: (_) => const [
+          PopupMenuItem(
+            value: 'rokomari',
+            child: Row(
+              children: [
+                Icon(Icons.shopping_bag, size: 20, color: Colors.green),
+                SizedBox(width: 8),
+                Text('Rokomari'),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'amazon',
+            child: Row(
+              children: [
+                Icon(Icons.auto_awesome, size: 20, color: Colors.orange),
+                SizedBox(width: 8),
+                Text('Amazon'),
+              ],
+            ),
+          ),
+        ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [Color(0xFF6D4C41), Color(0xFF8B4513)]),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: const Text(
-            'Add to list',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+            'Get the Book',
+            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
           ),
         ),
       ),
+
+      const SizedBox(width: 10),
+
+      // ADD TO LIST – Small + Left aligned
+      OutlinedButton(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Add to shelf coming soon!')),
+          );
+        },
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          side: const BorderSide(color: Color(0xFF6D4C41), width: 1.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          minimumSize: const Size(0, 0),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: const Text(
+          'Add to list',
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF6D4C41)),
+        ),
+      ),
+
+      const Spacer(), // ← This pushes both buttons to the LEFT
     ],
   ),
-),
-            
-            
+), 
             const Divider(height: 50),
 
             // ===== GENRE SECTION =====
@@ -401,3 +436,4 @@ extension ColorExtension on Color {
     return hslDark.toColor();
   }
 }
+
