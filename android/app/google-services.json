@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "283668579490",
+    "project_id": "bookread-efbc2",
+    "storage_bucket": "bookread-efbc2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:283668579490:android:aa8eb5d8ee909ac46e83fb",
+        "android_client_info": {
+          "package_name": "com.yourname.bangla_read"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgIKDQ-EmomVDEc8SRg5FzQiXOeXyKTAY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

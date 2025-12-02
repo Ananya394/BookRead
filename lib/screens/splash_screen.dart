@@ -1,7 +1,7 @@
 // lib/screens/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../main.dart';   // or wherever HomePage is
+import 'Login_page.dart'; // Replace '../main.dart' with this
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,9 +14,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 1), () {
+      // 0.5 seconds
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const LoginPage()),
       );
     });
   }
@@ -24,10 +25,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6D4C41),   // your warm brown
-      body: SafeArea(                 // ← THIS PREVENTS OVERFLOW
+      backgroundColor: const Color(0xFF6D4C41), // your warm brown
+      body: SafeArea(
+        // ← THIS PREVENTS OVERFLOW
         child: Center(
-          child: SingleChildScrollView(   // ← THIS MAKES IT WORK ON SMALL SCREENS
+          child: SingleChildScrollView(
+            // ← THIS MAKES IT WORK ON SMALL SCREENS
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -45,8 +48,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
                 // Book image – responsive size
                 Image.asset(
-                  'assets/images/image.jpg',   // your local image
-                  width: MediaQuery.of(context).size.width * 0.75,  // 75% of screen width
+                  'assets/images/image.jpg', // your local image
+                  width: MediaQuery.of(context).size.width *
+                      0.75, // 75% of screen width
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 50),
@@ -54,15 +58,21 @@ class _SplashScreenState extends State<SplashScreen> {
                 // Taglines
                 const Text(
                   'বাংলা সাহিত্যের ডিজিটাল রূপ',
-                  style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 const Text(
                   'পড়ুন • ভালোবাসুন • শেয়ার করুন',
-                  style: TextStyle(fontSize: 17, color: Colors.white70, fontStyle: FontStyle.italic),
+                  style: TextStyle(
+                      fontSize: 17,
+                      color: Colors.white70,
+                      fontStyle: FontStyle.italic),
                 ),
-                const SizedBox(height: 40),   // safe bottom space
+                const SizedBox(height: 40), // safe bottom space
               ],
             ),
           ),
